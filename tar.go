@@ -30,8 +30,18 @@ func LocalTarCmdArgs(path, exclude string) []string {
 			args = append(args, `--exclude=`+trimmed)
 		}
 	}
-
-	args = append(args, "-C", ".", "-czf", "-", path)
+	pathDir := "."
+	if path != "" {
+		pos := strings.LastIndex(path, "/")
+		if pos != -1 {
+			pathDir = path[:pos]
+			path = path[pos+1:]
+		}
+		if path == "" { // /a/b/c/ == tar -C /a/b/c/ -czf - .
+			path = "."
+		}
+	}
+	args = append(args, "-C", pathDir, "-czf", "-", path)
 	return args
 }
 
